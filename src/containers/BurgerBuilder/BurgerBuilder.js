@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, {Component, Fragment} from 'react'
 import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal'
@@ -16,28 +16,30 @@ const INGREDIENT_PRICES = {
 };
 
 class BurgerBuilder extends Component {
-  
+
   state = {
-    ingredients: {
-      salad: 0,
-      bacon: 0,
-      cheese: 0,
-      meat: 0,
-    },
+    ingredients: null,
     totalPrice: 0,
     purchasable: false,
     purchase: false,
-    loading: false
+    loading: false,
+    ingredientsLoadError: false
   };
-  
+
+  componentDidMount() {
+    axios.get("https://react-my-burger-95879.firebaseio.com/ingredients.json")
+      .then(r => this.setState({ingredients: r.data}))
+      .catch(e => this.setState({ingredientsLoadError: true}))
+  }
+
   updatePurchaseState = (ingredients) => {
     const sum = Object.keys(ingredients)
-    .map(igKey => ingredients[igKey])
-    .reduce((sum, el) => sum + el, 0);
-    
+      .map(igKey => ingredients[igKey])
+      .reduce((sum, el) => sum + el, 0);
+
     this.setState({purchasable: sum > 0})
   };
-  
+
   addIngredientHandler = (type) => {
     const newCount = this.state.ingredients[type] + 1;
     const updatedIngredients = {
@@ -48,10 +50,10 @@ class BurgerBuilder extends Component {
     this.setState({totalPrice: newPrice, ingredients: updatedIngredients});
     this.updatePurchaseState(updatedIngredients)
   };
-  
+
   removeIngredientHandler = (type) => {
     const oldCount = this.state.ingredients[type];
-    if (oldCount <= 0 ) return;
+    if (oldCount <= 0) return;
     const newCount = oldCount - 1;
     const updatedIngredients = {
       ...this.state.ingredients
@@ -61,15 +63,15 @@ class BurgerBuilder extends Component {
     this.setState({totalPrice: newPrice, ingredients: updatedIngredients});
     this.updatePurchaseState(updatedIngredients)
   };
-  
+
   purchaseHandler = () => {
     this.setState({purchase: true})
   };
-  
+
   purchaseCancelHandler = () => {
     this.setState({purchase: false})
   };
-  
+
   purchaseContinueHandler = () => {
     // alert('You continue')
     this.setState({loading: true});
@@ -98,19 +100,42 @@ class BurgerBuilder extends Component {
         this.setState({loading: false, purchase: false})
       })
   };
-  
-  render () {
+
+  render() {
     const disabledInfo = {...this.state.ingredients};
     for (let key in disabledInfo)
       disabledInfo[key] = disabledInfo[key] <= 0
 
-    let orderSummary = <OrderSummary
-      totalPrice={this.state.totalPrice}
-      purchaseContinued={this.purchaseContinueHandler}
-      purchaseCancelled={this.purchaseCancelHandler}
-      ingredients={this.state.ingredients}/>;
+    let orderSummary = null;
 
-    if(this.state.loading) {
+    let burger = this.state.ingredientsLoadError ?
+      <p>Ingredients can't be loaded</p>
+      : <Spinner/>;
+    if (this.state.ingredients) {
+      burger = (
+        <Fragment>
+          <Burger ingredients={this.state.ingredients}/>
+          <BuildControls
+            ingredientAdded={this.addIngredientHandler}
+            ingredientRemoved={this.removeIngredientHandler}
+            disabled={disabledInfo}
+            purchasable={this.state.purchasable}
+            price={this.state.totalPrice}
+            ordered={this.purchaseHandler}
+          />
+        </Fragment>
+      );
+
+      orderSummary = (
+        <OrderSummary
+          totalPrice={this.state.totalPrice}
+          purchaseContinued={this.purchaseContinueHandler}
+          purchaseCancelled={this.purchaseCancelHandler}
+          ingredients={this.state.ingredients}/>
+      )
+    }
+
+    if (this.state.loading) {
       orderSummary = <Spinner/>
     }
 
@@ -120,15 +145,7 @@ class BurgerBuilder extends Component {
                modalClosed={this.purchaseCancelHandler}>
           {orderSummary}
         </Modal>
-        <Burger ingredients={this.state.ingredients}/>
-        <BuildControls
-          ingredientAdded={this.addIngredientHandler}
-          ingredientRemoved={this.removeIngredientHandler}
-          disabled={disabledInfo}
-          purchasable={this.state.purchasable}
-          price={this.state.totalPrice}
-          ordered={this.purchaseHandler}
-        />
+        {burger}
       </Fragment>
     )
   }
