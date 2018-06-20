@@ -101,13 +101,14 @@ class BurgerBuilder extends Component {
     //   })
 
     const s = Object.keys(this.state.ingredients)
-      .map(k => k + "=" + this.state.ingredients[k])
+      .map(k => encodeURIComponent(k)
+        + "=" + encodeURIComponent(this.state.ingredients[k]))
       .join("&");
 
     this.setState({loading: false, purchase: false});
     this.props.history.push({
       pathname: "/checkout",
-        search: '?' + s,
+        search: '?' + s + "&price=" + this.state.totalPrice,
     })
   };
 
