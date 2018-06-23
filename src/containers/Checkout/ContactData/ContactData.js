@@ -34,6 +34,7 @@ class ContactData extends Component {
         validation: {
           required: true,
           valid: false,
+          touched: false,
         },
       },
       zipCode: {
@@ -48,6 +49,7 @@ class ContactData extends Component {
           minLength: 5,
           maxLength: 5,
           valid: false,
+          touched: false,
         },
       },
       country: {
@@ -60,6 +62,7 @@ class ContactData extends Component {
         validation: {
           required: true,
           valid: false,
+          touched: false,
         },
       },
       email: {
@@ -72,6 +75,7 @@ class ContactData extends Component {
         validation: {
           required: true,
           valid: false,
+          touched: false,
         },
       },
       deliveryMethod: {
@@ -91,9 +95,10 @@ class ContactData extends Component {
         value: "fastest",
       },
     },
+    orderFormIsValid: false,
   }
   
-  orderHandler = (event) => {
+  orderHandler        = (event) => {
     event.preventDefault()
     console.log(this.props.ingredients)
     this.setState({loading: true})
@@ -129,13 +134,27 @@ class ContactData extends Component {
       ...updatedOrderForm[inputIdentifier],
       value: event.target.value,
     }
-  
+    
     if (input.validation) {
-      input.validation.valid = this.checkValidity(input.value, input.validation)
+      input.validation.touched = true
+      input.validation.valid   =
+        this.checkValidity(input.value, input.validation)
     }
     console.log(input)
     updatedOrderForm[inputIdentifier] = input
-    this.setState({orderForm: updatedOrderForm})
+    
+    const orderFormIsValid = Object.keys(updatedOrderForm)
+    .reduce((acc, k) => {
+      const v = updatedOrderForm[k].validation
+      return v ? acc && v.valid : acc
+    }, true)
+    
+    console.log("form is valid", orderFormIsValid)
+    
+    this.setState({
+      orderForm: updatedOrderForm,
+      orderFormIsValid: orderFormIsValid,
+    })
   }
   
   checkValidity (value, rules) {
@@ -165,13 +184,17 @@ class ContactData extends Component {
         elementConfig={e.elementConfig}
         value={e.value}
         changed={(event) => this.inputChangedHandler(event, key)}
+        invalid={e.validation && e.validation.touched
+          ? !e.validation.valid
+          : false}
       />)
     })
     
     let form = (
       <form onSubmit={this.orderHandler}>
         {inputElements}
-        <Button btnType="Success">ORDER</Button>
+        <Button btnType="Success"
+                disabled={!this.state.orderFormIsValid}>ORDER</Button>
       </form>
     )
     if (this.state.loading) {
