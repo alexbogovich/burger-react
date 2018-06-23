@@ -11,15 +11,16 @@ const Input = props => {
     case ("textarea"):
       inputElement =
         <textarea className={classes.InputElement} {...props.elementConfig}
+                  onChange={props.changed}
                   value={props.value}/>
       break
     
     case ("select"):
       inputElement =
         <select className={classes.InputElement}
+                onChange={props.changed}
                 value={props.value}>
-          {
-            props.elementConfig.options.map((option, i) =>
+          {props.elementConfig.options.map((option, i) =>
               <option
                 key={i}
                 value={option.value}>
@@ -34,6 +35,7 @@ const Input = props => {
     default:
       inputElement =
         <input className={classes.InputElement} {...props.elementConfig}
+               onChange={props.changed}
                value={props.value}/>
       break
   }
@@ -50,6 +52,7 @@ Input.propTypes = {
   label: PropTypes.string,
   elementType: PropTypes.oneOf(["input", "textarea", "select"]).isRequired,
   elementConfig: PropTypes.object.isRequired,
+  changed: PropTypes.func,
   value: PropTypes.string,
 }
 
