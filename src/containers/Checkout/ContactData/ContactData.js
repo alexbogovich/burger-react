@@ -19,6 +19,10 @@ class ContactData extends Component {
           placeholder: "Your name",
         },
         value: "",
+        validation: {
+          required: true,
+          valid: false,
+        },
       },
       street: {
         elementType: "input",
@@ -27,6 +31,10 @@ class ContactData extends Component {
           placeholder: "Street",
         },
         value: "",
+        validation: {
+          required: true,
+          valid: false,
+        },
       },
       zipCode: {
         elementType: "input",
@@ -35,6 +43,12 @@ class ContactData extends Component {
           placeholder: "ZIP code",
         },
         value: "",
+        validation: {
+          required: true,
+          minLength: 5,
+          maxLength: 5,
+          valid: false,
+        },
       },
       country: {
         elementType: "input",
@@ -43,6 +57,10 @@ class ContactData extends Component {
           placeholder: "country",
         },
         value: "",
+        validation: {
+          required: true,
+          valid: false,
+        },
       },
       email: {
         elementType: "input",
@@ -51,6 +69,10 @@ class ContactData extends Component {
           placeholder: "E-mail",
         },
         value: "",
+        validation: {
+          required: true,
+          valid: false,
+        },
       },
       deliveryMethod: {
         elementType: "select",
@@ -76,17 +98,17 @@ class ContactData extends Component {
     console.log(this.props.ingredients)
     this.setState({loading: true})
     const formData = Object.keys(this.state.orderForm)
-    .reduce((acc ,key) => {
+    .reduce((acc, key) => {
       acc[key] = this.state.orderForm[key].value
       return acc
-    } , {})
+    }, {})
     
     console.log(formData)
     
     const order = {
       ingredients: this.props.ingredients,
       price: this.props.price,
-      orderData: formData
+      orderData: formData,
     }
     
     axios.post("/orders.json", order)
@@ -101,14 +123,36 @@ class ContactData extends Component {
     })
     
   }
-  
   inputChangedHandler = (event, inputIdentifier) => {
     const updatedOrderForm = {...this.state.orderForm}
-    updatedOrderForm[inputIdentifier] = {
+    const input            = {
       ...updatedOrderForm[inputIdentifier],
-      value: event.target.value
+      value: event.target.value,
     }
+  
+    if (input.validation) {
+      input.validation.valid = this.checkValidity(input.value, input.validation)
+    }
+    console.log(input)
+    updatedOrderForm[inputIdentifier] = input
     this.setState({orderForm: updatedOrderForm})
+  }
+  
+  checkValidity (value, rules) {
+    let isValid = true
+    
+    if (rules.required) {
+      isValid &= value.trim() !== ""
+    }
+    
+    if (rules.minLength) {
+      isValid &= value.trim().length >= rules.minLength
+    }
+    if (rules.maxLength) {
+      isValid &= value.trim().length <= rules.maxLength
+    }
+    
+    return isValid
   }
   
   render () {
