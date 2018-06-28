@@ -1,5 +1,6 @@
 import PropTypes from "prop-types"
 import React, { Component } from "react"
+import { connect } from "react-redux"
 
 import axios from "../../../axios-order"
 import Button from "../../../components/UI/Button/Button"
@@ -214,4 +215,11 @@ ContactData.propTypes = {
   ingredients: PropTypes.object.isRequired,
 }
 
-export default ContactData
+const mapStateToProps = state => {
+  return {
+    ingredients: state.ingredients,
+    price: state.totalPrice,
+  }
+}
+
+export default connect(mapStateToProps)(ContactData)
