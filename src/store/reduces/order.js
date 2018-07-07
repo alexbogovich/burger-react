@@ -2,11 +2,13 @@ import {
   PURCHASE_BURGER_FAIL,
   PURCHASE_BURGER_START,
   PURCHASE_BURGER_SUCCESS,
+  PURCHASE_INIT,
 } from "../actions/actionTypes"
 
 const initState = {
   orders: [],
   loading: false,
+  purchased: false,
 }
 
 export default (state = initState, action) => {
@@ -25,11 +27,17 @@ export default (state = initState, action) => {
         ...state,
         loading: false,
         orders: state.orders.concat(newOrder),
+        purchased: true,
       }
     case PURCHASE_BURGER_FAIL:
       return {
         ...state,
         loading: false,
+      }
+    case PURCHASE_INIT:
+      return {
+        ...state,
+        purchased: false,
       }
     default:
       return state

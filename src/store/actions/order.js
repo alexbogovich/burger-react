@@ -3,6 +3,7 @@ import {
   PURCHASE_BURGER_FAIL,
   PURCHASE_BURGER_START,
   PURCHASE_BURGER_SUCCESS,
+  PURCHASE_INIT,
 } from "./actionTypes"
 
 export const purchaseBurgerSuccess = (id, orderData) => ({
@@ -31,3 +32,7 @@ export const purchaseBurger = orderData => dispatch => {
     dispatch(purchaseBurgerError(e))
   })
 }
+
+export const purchaseInit = () => ({
+  type: PURCHASE_INIT,
+})

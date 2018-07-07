@@ -10,6 +10,7 @@ import Spinner from "../../components/UI/Spinner/Spinner"
 import {
   addIngredient,
   initIngredients,
+  purchaseInit,
   removeIngredient,
 } from "../../store/actions"
 import withErrorHandler from "../withErrorHandler/withErrorHandler"
@@ -34,6 +35,7 @@ class BurgerBuilder extends Component {
     this.setState({purchase: false})
   }
   purchaseContinueHandler = () => {
+    this.props.onInitPurchase()
     this.props.history.push("/checkout")
   }
   
@@ -97,6 +99,7 @@ const mapDispatchToProps = dispatch => ({
   onIngredientAdded: name => dispatch(addIngredient(name)),
   onIngredientRemoved: name => dispatch(removeIngredient(name)),
   onInitIngredients: () => dispatch(initIngredients()),
+  onInitPurchase: () => dispatch(purchaseInit()),
 })
 
 export default connect(
