@@ -42,6 +42,7 @@ export default (state = initialState, action) => {
       return {
         ...state,
         ingredients: action.ingredients,
+        totalPrice: 4,
         error: false,
       }
     case INGREDIENT_FETCH_FAILED:
