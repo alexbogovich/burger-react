@@ -7,7 +7,7 @@ import Burger from "../../components/Burger/Burger"
 import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary"
 import Modal from "../../components/UI/Modal/Modal"
 import Spinner from "../../components/UI/Spinner/Spinner"
-import { INGREDIENT_ADD, INGREDIENT_REMOVE } from "../../store/actions"
+import { addIngredident, removeIngredident } from "../../store/actions"
 import withErrorHandler from "../withErrorHandler/withErrorHandler"
 
 class BurgerBuilder extends Component {
@@ -91,25 +91,15 @@ class BurgerBuilder extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  return {
+const mapStateToProps = state => ({
     ingredients: state.ingredients,
     totalPrice: state.totalPrice,
-  }
-}
+})
 
-const mapDispatchToProps = dispatch => {
-  return {
-    onIngredientAdded: (ingredientName) => dispatch({
-      type: INGREDIENT_ADD,
-      ingredientName: ingredientName,
-    }),
-    onIngredientRemoved: (ingredientName) => dispatch({
-      type: INGREDIENT_REMOVE,
-      ingredientName: ingredientName,
-    }),
-  }
-}
+const mapDispatchToProps = dispatch => ({
+  onIngredientAdded: name => dispatch(addIngredident(name)),
+  onIngredientRemoved: name => dispatch(removeIngredident(name)),
+})
 
 export default connect(
   mapStateToProps,

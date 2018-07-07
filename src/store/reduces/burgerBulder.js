@@ -1,4 +1,4 @@
-import { INGREDIENT_ADD, INGREDIENT_REMOVE } from "./actions"
+import { INGREDIENT_ADD, INGREDIENT_REMOVE } from "../actions/actionTypes"
 
 const initialState = {
   ingredients: {
@@ -17,7 +17,7 @@ const INGREDIENT_PRICES = {
   bacon: 0.7,
 }
 
-const reducer = (state = initialState, action) => {
+export default (state = initialState, action) => {
   switch (action.type) {
     case INGREDIENT_ADD:
       return {
@@ -41,5 +41,3 @@ const reducer = (state = initialState, action) => {
       return state
   }
 }
-
-export default reducer
