@@ -1,42 +1,49 @@
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import Order from "../../components/Order/Order";
+import React, { Component } from "react"
+import { connect } from "react-redux"
 
 import axios from "../../axios-order"
-import withErrorHandler from "../withErrorHandler/withErrorHandler";
+import Order from "../../components/Order/Order"
+import Spinner from "../../components/UI/Spinner/Spinner"
+import { fetchOrders } from "../../store/actions"
+import withErrorHandler from "../withErrorHandler/withErrorHandler"
 
 class Orders extends Component {
-
-  state = {
-    orders: [],
-    loading: true
-  };
-
-  componentDidMount() {
-    axios.get("orders.json")
-      .then(r => {
-        console.log(r.data);
-        const fetchOrders = [];
-        for(let key in r.data) {
-          fetchOrders.push({...r.data[key], id: key})
-        }
-        this.setState({loading: false, orders: fetchOrders})
-      })
-      .catch(e => {
-        this.setState({loading: false})
-      })
+  componentDidMount () {
+    this.props.onFetchOrders()
   }
-
-
-  render() {
-    return (
-      <div>
-        {this.state.orders.map(order => <Order key={order.id} ingredients={order.ingredients} price={+order.price} />)}
-      </div>
-    );
+  
+  render () {
+    let orders = <Spinner/>
+    if (!this.props.loading) {
+      orders = (
+        <div>
+          {this.props.orders
+          .map(order =>
+            <Order
+              key={order.id}
+              ingredients={order.ingredients}
+              price={+order.price}
+            />,
+          )}
+        </div>
+      )
+    }
+    return orders
   }
 }
 
-Orders.propTypes = {};
+Orders.propTypes = {}
 
-export default withErrorHandler(Orders, axios);
+const mapStateToProps = state => ({
+  orders: state.order.orders,
+  loading: state.order.loading,
+})
+
+const mapDispatchToProps = dispatch => ({
+  onFetchOrders: () => dispatch(fetchOrders()),
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withErrorHandler(Orders, axios))

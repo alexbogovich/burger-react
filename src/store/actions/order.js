@@ -1,5 +1,8 @@
 import axios from "../../axios-order"
 import {
+  FETCH_ORDER_FAIL,
+  FETCH_ORDER_START,
+  FETCH_ORDER_SUCCESS,
   PURCHASE_BURGER_FAIL,
   PURCHASE_BURGER_START,
   PURCHASE_BURGER_SUCCESS,
@@ -36,3 +39,32 @@ export const purchaseBurger = orderData => dispatch => {
 export const purchaseInit = () => ({
   type: PURCHASE_INIT,
 })
+
+const fetchOrdersSuccess = orders => ({
+  type: FETCH_ORDER_SUCCESS,
+  orders: orders,
+})
+
+const fetchOrdersFail = err => ({
+  type: FETCH_ORDER_FAIL,
+  error: err,
+})
+
+const fetchOrdersStart = () => ({
+  type: FETCH_ORDER_START,
+})
+
+export const fetchOrders = () => dispatch => {
+  dispatch(fetchOrdersStart())
+  
+  axios.get("orders.json")
+  .then(r => {
+    console.log(r.data)
+    const fetchOrders = Object.keys(r.data)
+    .map(key => ({...r.data[key], id: key}))
+    dispatch(fetchOrdersSuccess(fetchOrders))
+  })
+  .catch(e => {
+    dispatch(fetchOrdersFail(e))
+  })
+}
