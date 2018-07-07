@@ -1,3 +1,6 @@
 export {
   addIngredient, removeIngredient, initIngredients,
-}from "./burgerBulder"
+} from "./burgerBulder"
+export {
+  purchaseBurger,
+} from "./order"
