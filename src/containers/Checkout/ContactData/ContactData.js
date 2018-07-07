@@ -1,10 +1,13 @@
 import PropTypes from "prop-types"
 import React, { Component } from "react"
+import { connect } from "react-redux"
 
 import axios from "../../../axios-order"
 import Button from "../../../components/UI/Button/Button"
 import Input from "../../../components/UI/Input/Input"
 import Spinner from "../../../components/UI/Spinner/Spinner"
+import { purchaseBurger } from "../../../store/actions"
+import withErrorHandler from "../../withErrorHandler/withErrorHandler"
 
 import classes from "./ContactData.module.css"
 
@@ -98,10 +101,9 @@ class ContactData extends Component {
     orderFormIsValid: false,
   }
   
-  orderHandler        = (event) => {
+  orderHandler = (event) => {
     event.preventDefault()
     console.log(this.props.ingredients)
-    this.setState({loading: true})
     const formData = Object.keys(this.state.orderForm)
     .reduce((acc, key) => {
       acc[key] = this.state.orderForm[key].value
@@ -116,28 +118,18 @@ class ContactData extends Component {
       orderData: formData,
     }
     
-    axios.post("/orders.json", order)
-    .then(r => {
-      console.log(r)
-      this.setState({loading: false})
-      this.props.history.push("/")
-    })
-    .catch(e => {
-      console.log(e)
-      this.setState({loading: false})
-    })
-    
+    this.props.onOrderBurger(order)
   }
   inputChangedHandler = (event, inputIdentifier) => {
     const updatedOrderForm = {...this.state.orderForm}
-    const input            = {
+    const input = {
       ...updatedOrderForm[inputIdentifier],
       value: event.target.value,
     }
     
     if (input.validation) {
       input.validation.touched = true
-      input.validation.valid   =
+      input.validation.valid =
         this.checkValidity(input.value, input.validation)
     }
     console.log(input)
@@ -197,7 +189,7 @@ class ContactData extends Component {
                 disabled={!this.state.orderFormIsValid}>ORDER</Button>
       </form>
     )
-    if (this.state.loading) {
+    if (this.props.loading) {
       form = <Spinner/>
     }
     
@@ -214,4 +206,17 @@ ContactData.propTypes = {
   ingredients: PropTypes.object.isRequired,
 }
 
-export default ContactData
+const mapStateToProps = state => ({
+  ingredients: state.burgerBuilder.ingredients,
+  price: state.burgerBuilder.totalPrice,
+  loading: state.order.loading,
+})
+
+const mapDispatchToProps = dispatch => ({
+  onOrderBurger: orderData => dispatch(purchaseBurger(orderData)),
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(withErrorHandler(ContactData, axios))
