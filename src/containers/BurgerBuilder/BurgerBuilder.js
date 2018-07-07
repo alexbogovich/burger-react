@@ -7,15 +7,17 @@ import Burger from "../../components/Burger/Burger"
 import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary"
 import Modal from "../../components/UI/Modal/Modal"
 import Spinner from "../../components/UI/Spinner/Spinner"
-import { addIngredident, removeIngredident } from "../../store/actions"
+import {
+  addIngredient,
+  initIngredients,
+  removeIngredient,
+} from "../../store/actions"
 import withErrorHandler from "../withErrorHandler/withErrorHandler"
 
 class BurgerBuilder extends Component {
   
   state = {
     purchase: false,
-    loading: false,
-    ingredientsLoadError: false,
   }
   updatePurchaseState = (ingredients) => {
     const sum = Object.keys(ingredients)
@@ -36,9 +38,7 @@ class BurgerBuilder extends Component {
   }
   
   componentDidMount () {
-//    axios.get("https://react-my-burger-95879.firebaseio.com/ingredients.json")
-//      .then(r => this.setState({ingredients: r.data}))
-//      .catch(e => this.setState({ingredientsLoadError: true}))
+    this.props.onInitIngredients()
   }
   
   render () {
@@ -47,8 +47,8 @@ class BurgerBuilder extends Component {
       disabledInfo[key] = disabledInfo[key] <= 0
     
     let orderSummary = null
-    
-    let burger = this.state.ingredientsLoadError ?
+  
+    let burger = this.props.error ?
       <p>Ingredients can't be loaded</p>
       : <Spinner/>
     if (this.props.ingredients) {
@@ -75,10 +75,6 @@ class BurgerBuilder extends Component {
       )
     }
     
-    if (this.state.loading) {
-      orderSummary = <Spinner/>
-    }
-    
     return (
       <Fragment>
         <Modal show={this.state.purchase}
@@ -92,13 +88,15 @@ class BurgerBuilder extends Component {
 }
 
 const mapStateToProps = state => ({
-    ingredients: state.ingredients,
-    totalPrice: state.totalPrice,
+  ingredients: state.ingredients,
+  totalPrice: state.totalPrice,
+  error: state.error,
 })
 
 const mapDispatchToProps = dispatch => ({
-  onIngredientAdded: name => dispatch(addIngredident(name)),
-  onIngredientRemoved: name => dispatch(removeIngredident(name)),
+  onIngredientAdded: name => dispatch(addIngredient(name)),
+  onIngredientRemoved: name => dispatch(removeIngredient(name)),
+  onInitIngredients: () => dispatch(initIngredients()),
 })
 
 export default connect(

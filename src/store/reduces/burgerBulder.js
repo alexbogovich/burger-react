@@ -1,13 +1,14 @@
-import { INGREDIENT_ADD, INGREDIENT_REMOVE } from "../actions/actionTypes"
+import {
+  INGREDIENT_ADD,
+  INGREDIENT_FETCH_FAILED,
+  INGREDIENT_REMOVE,
+  INGREDIENT_SET,
+} from "../actions/actionTypes"
 
 const initialState = {
-  ingredients: {
-    salad: 0,
-    bacon: 0,
-    cheese: 0,
-    meat: 0,
-  },
+  ingredients: null,
   totalPrice: 4,
+  error: false,
 }
 
 const INGREDIENT_PRICES = {
@@ -36,6 +37,17 @@ export default (state = initialState, action) => {
           [action.ingredientName]: state.ingredients[action.ingredientName] - 1,
         },
         totalPrice: state.totalPrice - INGREDIENT_PRICES[action.ingredientName],
+      }
+    case INGREDIENT_SET:
+      return {
+        ...state,
+        ingredients: action.ingredients,
+        error: false,
+      }
+    case INGREDIENT_FETCH_FAILED:
+      return {
+        ...state,
+        error: true,
       }
     default:
       return state
