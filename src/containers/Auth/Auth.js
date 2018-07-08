@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import { connect } from "react-redux"
 import Button from "../../components/UI/Button/Button"
 import Input from "../../components/UI/Input/Input"
-import { auth } from "../../store/actions"
+import { signIn, signUp } from "../../store/actions"
 
 import classes from "./Auth.module.css"
 
@@ -39,6 +39,7 @@ class Auth extends Component {
       },
     },
     authFormIsValid: false,
+    inSignUp: true,
   }
   
   checkValidity = (value, rules) => {
@@ -56,6 +57,10 @@ class Auth extends Component {
     }
     
     return isValid
+  }
+  
+  switchAuthModeHandler = () => {
+    this.setState(prevState => ({inSignUp: !prevState.inSignUp}))
   }
   
   inputChangedHandler = (event, inputIdentifier) => {
@@ -88,8 +93,17 @@ class Auth extends Component {
   }
   submitHandler = (event) => {
     event.preventDefault()
-    this.props
-    .onAuth(this.state.controls.email.value, this.state.controls.password.value)
+    if (this.state.inSignUp) {
+      this.props.onSignUp(
+        this.state.controls.email.value,
+        this.state.controls.password.value,
+      )
+    } else {
+      this.props.onSignIn(
+        this.state.controls.email.value,
+        this.state.controls.password.value,
+      )
+    }
   }
   
   render () {
@@ -115,6 +129,9 @@ class Auth extends Component {
           <Button btnType="Success"
                   disabled={!this.state.authFormIsValid}>SUBMIT</Button>
         </form>
+        <Button btnType="Danger" clicked={this.switchAuthModeHandler}>
+          SWITCH TO {this.state.inSignUp ? "SIGNIN" : "SIGNUP"}
+        </Button>
       </div>
     )
   }
@@ -127,7 +144,8 @@ class Auth extends Component {
 //})
 
 const mapDispatchToProps = dispatch => ({
-  onAuth: (email, password) => dispatch(auth(email, password)),
+  onSignUp: (email, password) => dispatch(signUp(email, password)),
+  onSignIn: (email, password) => dispatch(signIn(email, password)),
 })
 
 export default connect(null, mapDispatchToProps)(Auth)
